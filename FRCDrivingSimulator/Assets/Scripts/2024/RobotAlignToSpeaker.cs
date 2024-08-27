@@ -20,6 +20,8 @@ public class RobotAlignToSpeaker : MonoBehaviour, IResettable
 
     public float maxAimDistance = 40f;
 
+    public float ampAngle = -100f;
+
     private Quaternion pivotLocalStartingRot;
 
     public bool stowedShooter = false;
@@ -42,6 +44,8 @@ public class RobotAlignToSpeaker : MonoBehaviour, IResettable
     public bool isShooting = false;
     private bool isPassing = false;
     public bool isStowing = false;
+
+    public bool continuousTracking = true;
     private bool isTrapping = false;
 
     [SerializeField] private bool robotThatRotatesUpForAmping;
@@ -118,7 +122,10 @@ public class RobotAlignToSpeaker : MonoBehaviour, IResettable
 
                 if (!isAmping && !isPassing)
                 {
-                    if (!amp && !(pass > 0f))
+                    if (distanceToTarget <= maxAimDistance && drive.isIntaking && !continuousTracking) {
+                        StowShooter();
+                    }
+                    else if (!amp && !(pass > 0f))
                     {
                         if (distanceToTarget <= maxAimDistance && !stowedShooter)
                         {
@@ -127,7 +134,7 @@ public class RobotAlignToSpeaker : MonoBehaviour, IResettable
                             else if (is1678) { downwardOffset = 16.6f; }
 
                             RotateShooter();
-                            stowedShooter = false;
+                            stowedShooter = false;                            
                         }
                         else if (distanceToTarget > maxAimDistance && robotHasUniquePassAngle && !(pass > 0f) && !stowedShooter)
                         {
@@ -205,7 +212,7 @@ public class RobotAlignToSpeaker : MonoBehaviour, IResettable
 
         Quaternion startRotation = shooterPivot.transform.localRotation;
 
-        Quaternion targetRotation = Quaternion.Euler(-100f, 0f, 0f);
+        Quaternion targetRotation = Quaternion.Euler(ampAngle, 0f, 0f);
 
         float elapsedTime = 0f;
         float duration = ampDuration;
